@@ -75,25 +75,25 @@ export default function EventMarker({ event, onClick }: Props) {
       style={{
         position: "relative",
         cursor: "pointer",
-        transform: "translate(-50%, -50%)"
       }}
     >
 
       {/* Timer badge */}
       <div
         style={{
-          position: "absolute",
-          bottom: 80,
-          left: "50%",
-          transform: "translateX(-50%)",
-          background: status.color,
-          color: "white",
-          padding: "4px 8px",
-          borderRadius: 6,
-          fontSize: 10,
-          fontWeight: 600,
-          whiteSpace: "nowrap"
-        }}
+  position: "absolute",
+  bottom: 70,
+  left: "50%",
+  transform: "translateX(-50%)",
+  background: status.color,
+  color: "white",
+  padding: "6px 10px",
+  borderRadius: 20,
+  fontSize: 11,
+  fontWeight: 600,
+  boxShadow: "0 4px 10px rgba(0,0,0,0.35)",
+  whiteSpace: "nowrap"
+}}
       >
         {status.label}
       </div>
@@ -135,17 +135,18 @@ export default function EventMarker({ event, onClick }: Props) {
       {/* Marker */}
       <div
         style={{
-          width: 40,
-          height: 40,
-          borderRadius: "50%",
-          background: "#ff3b30",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: 18,
-          color: "white",
-          boxShadow: "0 0 12px rgba(0,0,0,0.4)"
-        }}
+    width: 44,
+    height: 44,
+    borderRadius: "50%",
+    background: "linear-gradient(135deg,#ff3b30,#ff7a18)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: 20,
+    color: "white",
+    boxShadow: "0 6px 16px rgba(0,0,0,0.4)",
+    border: "3px solid rgba(255,255,255,0.85)"
+  }}
       >
         {getIcon()}
       </div>

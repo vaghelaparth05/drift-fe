@@ -1,58 +1,61 @@
-import { useState } from "react"
-import type { Event } from "../types/Events"
+import { useState } from "react";
+import type { Event } from "../types/Events";
+import { useRef, useEffect } from "react";
 
 type Props = {
-  event: Event
-}
+  event: Event;
+  onClose: () => void;
+};
 
 type Message = {
-  role: "user" | "assistant"
-  content: string
-}
+  role: "user" | "assistant";
+  content: string;
+};
 
-export default function ChatPanel({ event }: Props) {
-
+export default function ChatPanel({ event, onClose }: Props) {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: `Hi! I'm the guide for ${event.name}. Ask me anything about this event.`
-    }
-  ])
+      content: `Hi! I'm the guide for ${event.name}. Ask me anything about this event.`,
+    },
+  ]);
 
-  const [input, setInput] = useState("")
+  const [input, setInput] = useState("");
+
+  const bottomRef = useRef(null);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   const sendMessage = async () => {
-
-    if (!input.trim()) return
+    if (!input.trim()) return;
 
     const userMessage: Message = {
       role: "user",
-      content: input
-    }
+      content: input,
+    };
 
-    const newMessages = [...messages, userMessage]
+    const newMessages = [...messages, userMessage];
 
-    setMessages(newMessages)
-    setInput("")
+    setMessages(newMessages);
+    setInput("");
 
     const response = await fetch("http://localhost:3000/chat", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         event,
-        messages: newMessages
-      })
-    })
+        messages: newMessages,
+      }),
+    });
 
-    const data = await response.json()
+    const data = await response.json();
 
-    setMessages([
-      ...newMessages,
-      { role: "assistant", content: data.reply }
-    ])
-  }
+    setMessages([...newMessages, { role: "assistant", content: data.reply }]);
+  };
 
   return (
     <div
@@ -62,17 +65,41 @@ export default function ChatPanel({ event }: Props) {
         top: 0,
         width: 380,
         height: "100vh",
-        background: "#0f172a",
+        background: "linear-gradient(180deg,#0f172a,#020617)",
         color: "white",
         display: "flex",
         flexDirection: "column",
-        borderLeft: "1px solid #1e293b"
+        borderLeft: "1px solid rgba(255,255,255,0.05)",
       }}
     >
       {/* header */}
-      <div style={{ padding: 16, borderBottom: "1px solid #1e293b" }}>
-        <h3>{event.name}</h3>
-        <small>{event.location}</small>
+      <div
+        style={{
+          padding: 18,
+          borderBottom: "1px solid rgba(255,255,255,0.05)",
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+        }}
+      >
+        <button
+          onClick={onClose}
+          style={{
+            background: "rgba(255,255,255,0.05)",
+            border: "none",
+            color: "#60a5fa",
+            padding: "6px 10px",
+            borderRadius: 8,
+            cursor: "pointer",
+          }}
+        >
+          ← Back
+        </button>
+
+        <div>
+          <h3 style={{ margin: 0 }}>{event.name}</h3>
+          <small>{event.location}</small>
+        </div>
       </div>
 
       {/* messages */}
@@ -83,7 +110,7 @@ export default function ChatPanel({ event }: Props) {
           padding: 16,
           display: "flex",
           flexDirection: "column",
-          gap: 10
+          gap: 10,
         }}
       >
         {messages.map((m, i) => (
@@ -91,24 +118,29 @@ export default function ChatPanel({ event }: Props) {
             key={i}
             style={{
               alignSelf: m.role === "user" ? "flex-end" : "flex-start",
-              background: m.role === "user" ? "#2563eb" : "#1e293b",
-              padding: "8px 12px",
-              borderRadius: 8,
-              maxWidth: "80%"
+              background:
+                m.role === "user"
+                  ? "linear-gradient(135deg,#3b82f6,#2563eb)"
+                  : "rgba(255,255,255,0.05)",
+              padding: "10px 14px",
+              borderRadius: 14,
+              maxWidth: "75%",
+              lineHeight: 1.4,
             }}
           >
             {m.content}
           </div>
         ))}
       </div>
+      <div ref={bottomRef} />
 
       {/* input */}
       <div
         style={{
           padding: 12,
-          borderTop: "1px solid #1e293b",
+          borderTop: "1px solid rgba(255,255,255,0.05)",
           display: "flex",
-          gap: 8
+          gap: 8,
         }}
       >
         <input
@@ -116,9 +148,11 @@ export default function ChatPanel({ event }: Props) {
           onChange={(e) => setInput(e.target.value)}
           style={{
             flex: 1,
-            padding: 8,
-            borderRadius: 6,
-            border: "none"
+            padding: 10,
+            borderRadius: 10,
+            border: "1px solid rgba(255,255,255,0.1)",
+            background: "rgba(255,255,255,0.05)",
+            color: "white",
           }}
         />
 
@@ -129,12 +163,12 @@ export default function ChatPanel({ event }: Props) {
             background: "#3b82f6",
             border: "none",
             borderRadius: 6,
-            color: "white"
+            color: "white",
           }}
         >
           Send
         </button>
       </div>
     </div>
-  )
+  );
 }

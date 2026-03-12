@@ -19,6 +19,7 @@ export default function EventMap() {
     lat: -37.8136,
     lng: 144.9631,
   });
+  const [previousView, setPreviousView] = useState<any>(null)
 
   const mapRef = useRef<any>(null);
 
@@ -29,7 +30,7 @@ export default function EventMap() {
           key={event.id}
           latitude={event.lat}
           longitude={event.lng}
-          anchor="center"
+          anchor="bottom"
         >
           <EventMarker event={event} onClick={(e) => flyToEvent(e)} />
         </Marker>
@@ -37,10 +38,33 @@ export default function EventMap() {
     []
   );
 
+  const closeEvent = () => {
+
+  const map = mapRef.current?.getMap()
+
+  if (map && previousView) {
+    map.flyTo({
+      center: [previousView.lng, previousView.lat],
+      zoom: previousView.zoom,
+      duration: 1500
+    })
+  }
+
+  setSelectedEvent(null)
+}
+
   const flyToEvent = (event: Event) => {
     const map = mapRef.current?.getMap();
 
     if (!map) return;
+
+    const center = map.getCenter()
+
+  setPreviousView({
+    lat: center.lat,
+    lng: center.lng,
+    zoom: map.getZoom()
+  })
 
     map.flyTo({
       center: [event.lng, event.lat],
@@ -88,7 +112,18 @@ export default function EventMap() {
         {markers}
       </Map>
 
-      {selectedEvent && <ChatPanel event={selectedEvent} />}
+      {selectedEvent && <ChatPanel event={selectedEvent} onClose={closeEvent} />}
+
+      {selectedEvent && (
+  <div
+    style={{
+      position: "absolute",
+      inset: 0,
+      background: "rgba(0,0,0,0.25)",
+      pointerEvents: "none"
+    }}
+  />
+)}
     </div>
   );
 }
